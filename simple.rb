@@ -1,4 +1,8 @@
 class Number < Struct.new(:value)
+  def reducible?
+    false
+  end
+
   def to_s
     value.to_s
   end
@@ -9,6 +13,10 @@ class Number < Struct.new(:value)
 end
 
 class Add < Struct.new(:addend, :augend)
+  def reducible?
+    true
+  end
+
   def to_s
     "#{addend} + #{augend}"
   end
@@ -19,6 +27,10 @@ class Add < Struct.new(:addend, :augend)
 end
 
 class Multiply < Struct.new(:left, :right)
+  def reducible?
+    true
+  end
+
   def to_s
     "#{left} * #{right}"
   end
