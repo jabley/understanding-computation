@@ -13,6 +13,16 @@ class Number < Struct.new(:value)
 end
 
 class Add < Struct.new(:addend, :augend)
+  def reduce
+    if addend.reducible?
+      Add.new(addend.reduce, augend)
+    elsif augend.reducible?
+      Add.new(addend, augend.reduce)
+    else
+      Number.new(addend.value + augend.value)
+    end
+  end
+
   def reducible?
     true
   end
@@ -27,6 +37,16 @@ class Add < Struct.new(:addend, :augend)
 end
 
 class Multiply < Struct.new(:left, :right)
+  def reduce
+    if left.reducible?
+      Multiply.new(left.reduce, right)
+    elsif right.reducible?
+      Multiply.new(left, right.reduce)
+    else
+      Number.new(left.value * right.value)
+    end
+  end
+
   def reducible?
     true
   end
