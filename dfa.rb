@@ -44,3 +44,20 @@ class DFADesign < Struct.new(:start_state, :accept_states, :rulebook)
     to_dfa.tap { |dfa| dfa.read_string(string) }.accepting?
   end
 end
+
+require 'set'
+
+class NFARulebook < Struct.new(:rules)
+  def next_states(states, character)
+    states.flat_map { |state| follow_rules_for(state, character) }.to_set
+  end
+
+  def follow_rules_for(state, character)
+    rules_for(state, character).map(&:follow)
+  end
+
+  def rules_for(state, character)
+    rules.select { |rule| rule.applies_to?(state, character) }
+  end
+end
+
