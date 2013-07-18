@@ -120,6 +120,14 @@ class Empty
   def precedence
     3
   end
+
+  def to_nfa_design
+    start_state = Object.new
+    accept_states = [start_state]
+    rulebook = NFARulebook.new([])
+
+    NFADesign.new(start_state, accept_states, rulebook)
+  end
 end
 
 class Literal < Struct.new(:character)
@@ -131,6 +139,15 @@ class Literal < Struct.new(:character)
 
   def precedence
     3
+  end
+
+  def to_nfa_design
+    start_state = Object.new
+    accept_state = Object.new
+    rule = FARule.new(start_state, character, accept_state)
+    rulebook = NFARulebook.new([rule])
+
+    NFADesign.new(start_state, [accept_state], rulebook)
   end
 end
 
