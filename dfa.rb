@@ -194,6 +194,28 @@ class Choose < Struct.new(:first, :second)
   def precedence
     0
   end
+
+  def to_nfa_design
+    first_nfa_design = first.to_nfa_design
+    second_nfa_design = second.to_nfa_design
+
+    # A new start state
+    start_state = Object.new
+
+    # the union of accept states
+    accept_states = first_nfa_design.accept_states + second_nfa_design.accept_states
+
+    # the union of rules
+    rules = first_nfa_design.rulebook.rules + second_nfa_design.rulebook.rules
+
+    # Connect the start states of each NFA to the new start state usng free moves
+    extra_rules = [first_nfa_design, second_nfa_design].map { |nfa_design|
+      FARule.new(start_state, nil, nfa_design.start_state)
+    }
+    rulebook = NFARulebook.new(rules + extra_rules)
+
+    NFADesign.new(start_state, accept_states, rulebook)
+  end
 end
 
 class Repeat < Struct.new(:pattern)
