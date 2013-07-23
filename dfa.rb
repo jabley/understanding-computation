@@ -228,4 +228,28 @@ class Repeat < Struct.new(:pattern)
   def precedence
     2
   end
+
+  def to_nfa_design
+    pattern_nfa_design = pattern.to_nfa_design
+
+    # a new start state, which will also be an accept state
+    start_state = Object.new
+
+    # all the accept states from the old NFA, plus the new start state
+    accept_states = pattern_nfa_design.accept_states + [start_state]
+
+    # all the rules from the old NFA
+    rules = pattern_nfa_design.rulebook.rules
+
+    # Some extra free moves to connect each old accept state to the old start
+    # state, plus a single extra free move to connect the new start state to
+    # the old NFA start state
+    extra_rules = pattern_nfa_design.accept_states.map { |accept_state|
+      FARule.new(accept_state, nil, pattern_nfa_design.start_state)
+    } + [FARule.new(start_state, nil, pattern_nfa_design.start_state)]
+
+    rulebook = NFARulebook.new(rules + extra_rules)
+
+    NFADesign.new(start_state, accept_states, rulebook)
+  end
 end
