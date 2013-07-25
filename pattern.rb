@@ -92,8 +92,8 @@ class NFADesign < Struct.new(:start_state, :accept_states, :rulebook)
   def accepts?(string)
     to_nfa.tap { |nfa| nfa.read_string(string) }.accepting?
   end
-  def to_nfa
-    NFA.new(Set[start_state], accept_states, rulebook)
+  def to_nfa(current_states = Set[start_state])
+    NFA.new(current_states, accept_states, rulebook)
   end
 end
 
@@ -251,5 +251,13 @@ class Repeat < Struct.new(:pattern)
     rulebook = NFARulebook.new(rules + extra_rules)
 
     NFADesign.new(start_state, accept_states, rulebook)
+  end
+end
+
+class NFASimulation < Struct.new(:nfa_design)
+  def next_state(state, character)
+    nfa_design.to_nfa(state).tap { |nfa|
+      nfa.read_character(character)
+    }.current_states
   end
 end
