@@ -69,6 +69,10 @@ class NFARulebook < Struct.new(:rules)
       follow_free_moves(states + more_states)
     end
   end
+
+  def alphabet
+    rules.map(&:character).compact.uniq
+  end
 end
 
 class NFA < Struct.new(:current_states, :accept_states, :rulebook)
@@ -259,5 +263,11 @@ class NFASimulation < Struct.new(:nfa_design)
     nfa_design.to_nfa(state).tap { |nfa|
       nfa.read_character(character)
     }.current_states
+  end
+
+  def rules_for(state)
+    nfa_design.rulebook.alphabet.map { |character|
+      FARule.new(state, character, next_state(state, character))
+    }
   end
 end
